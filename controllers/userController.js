@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/helpers/generateToken.js";
+import passport from "passport";
 
 //signup user
 const signupUser = async (req, res) => {
@@ -38,44 +39,67 @@ const signupUser = async (req, res) => {
         email: newUser.email,
       });
     } else {
-      res.status(400).json({ message: "Invalid user data" });
+      res.status(400).json({ msg: "Invalid user data" });
     }
   } catch (error) {
     console.log(`Error in signupUser: ${error.message}`);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ msg: error.message });
   }
 };
 
 //login user
+
+// const signinUser = async (req, res) => {
+//   try {
+//     const { username, password, email } = req.body;
+
+//     const user = await User.findOne(email ? { email } : { username });
+//     if (!user) return res.status(404).json({ message: "No user found" });
+
+//     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+//     if (!isPasswordCorrect)
+//       return res.status(400).json({ message: "Invalid username or password" });
+
+//     //generate token
+//     generateToken(user._id, res);
+
+//     return res.status(200).json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       username: user.username,
+//       profilePic: user.profilePic,
+//     });
+//   } catch (error) {
+//     console.log(`Error in sigInpUser controller: ${error.message}`);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 const signinUser = async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  passport.authenticate("local", { session: false }, (err, user, info) => {
+    console.log("inside local", user);
+    if (err) {
+      return res.status(500).json({ msg: "error in sign in" });
+    }
 
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ message: "No user found" });
+    if (!user) {
+      return res.status(400).json({ msg: info.msg || "Invalid credentials" });
+    }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    //Generate token if authentication is successful
 
-    if (!isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid username or password" });
+    const token = generateToken(user._id);
 
-    //generate token
-    generateToken(user._id, res);
+    //send res back
 
-    return res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      username: user.username,
-      profilePic: user.profilePic,
-    });
-  } catch (error) {
-    console.log(`Error in sigInpUser controller: ${error.message}`);
-    res.status(500).json({ message: error.message });
-  }
+    return res.json({ msg: "Logged in successfuly", token, user });
+  })(req, res);
 };
 
 //logout user
+
 const logoutUser = (req, res) => {
   try {
     res.cookie("jwt", "", { maxAge: 1 });

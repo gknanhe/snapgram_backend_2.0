@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
+import passport from "passport";
+import initializePassport from "./config/passport-local.js";
 dotenv.config();
 
 connectDB();
@@ -10,9 +12,13 @@ const app = express();
 
 const PORT = process.env.PORT || 8000;
 
+// Initialize passport
+initializePassport(passport);
+
 app.use(express.json()); // to parse JSON data in req.body
 app.use(express.urlencoded({ extended: true })); // to parse form data in req.body
 app.use(cookieParser());
+app.use(passport.initialize());
 
 //Routes
 app.use("/api/users", userRoutes);
