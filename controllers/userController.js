@@ -5,13 +5,14 @@ import passport from "passport";
 
 //signup user
 const signupUser = async (req, res) => {
+  console.log(req.body);
   try {
     const { name, email, password, username } = req.body;
 
     const user = await User.findOne({ $or: [{ email }, { username }] });
 
     if (user) {
-      return res.status(400).json({ message: "User already Exists" });
+      return res.status(400).json({ msg: "User already Exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -32,11 +33,15 @@ const signupUser = async (req, res) => {
 
       generateToken(newUser._id, res);
 
+      // res.status(201).json({
+      //   _id: newUser._id,
+      //   name: newUser.name,
+      //   username: newUser.username,
+      //   email: newUser.email,
+      // });
       res.status(201).json({
-        _id: newUser._id,
-        name: newUser.name,
-        username: newUser.username,
-        email: newUser.email,
+        ok: true,
+        msg: "User Registerd",
       });
     } else {
       res.status(400).json({ msg: "Invalid user data" });
@@ -79,9 +84,9 @@ const signupUser = async (req, res) => {
 
 const signinUser = async (req, res) => {
   passport.authenticate("local", { session: false }, (err, user, info) => {
-    console.log("inside local", user);
     if (err) {
-      return res.status(500).json({ msg: "error in sign in" });
+      console.log(err);
+      return res.status(500).json({ msg: "Error in sign in" });
     }
 
     if (!user) {
@@ -90,11 +95,19 @@ const signinUser = async (req, res) => {
 
     //Generate token if authentication is successful
 
-    const token = generateToken(user._id);
+    // const token =
+    generateToken(user._id, res);
+
+    // Exclude password from the user object
+    const { password, ...userWithoutPassword } = user.toObject();
 
     //send res back
 
-    return res.json({ msg: "Logged in successfuly", token, user });
+    return res.json({
+      msg: "Logged in successfuly",
+      // token,
+      user: userWithoutPassword,
+    });
   })(req, res);
 };
 

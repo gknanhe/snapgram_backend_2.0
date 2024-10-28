@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import passport from "passport";
 import initializePassport from "./config/passport-local.js";
+import cors from "cors";
 dotenv.config();
 
 connectDB();
@@ -14,7 +15,12 @@ const PORT = process.env.PORT || 8000;
 
 // Initialize passport
 initializePassport(passport);
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json()); // to parse JSON data in req.body
 app.use(express.urlencoded({ extended: true })); // to parse form data in req.body
 app.use(cookieParser());
