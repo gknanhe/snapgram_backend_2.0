@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
+import authRoute from "./routes/authRoute.js";
 import passport from "passport";
 import initializePassport from "./config/passport-local.js";
 import cors from "cors";
@@ -28,5 +29,6 @@ app.use(passport.initialize());
 
 //Routes
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoute);
 
 app.listen(PORT, () => console.log(`Server started at ${PORT}`));
