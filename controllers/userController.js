@@ -114,13 +114,15 @@ const signinUser = async (req, res) => {
 //logout user
 
 const logoutUser = (req, res) => {
-  try {
-    res.cookie("jwt", "", { maxAge: 1 });
-    res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.log(`Error in logout controller: ${error.message}`);
-    res.status(500).json({ message: error.message });
-  }
+  req.logout((err) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ msg: "Failed to log out" });
+    }
+
+    res.clearCookie("snapgToken");
+    res.status(200).json({ msg: "Logged out successfully", user: null });
+  });
 };
 
 //follow unfollow
