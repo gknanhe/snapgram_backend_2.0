@@ -39,16 +39,16 @@ const signupUser = async (req, res) => {
       //   username: newUser.username,
       //   email: newUser.email,
       // });
-      res.status(201).json({
+      return res.status(201).json({
         ok: true,
         msg: "User Registerd",
       });
     } else {
-      res.status(400).json({ msg: "Invalid user data" });
+      return res.status(400).json({ msg: "Invalid user data" });
     }
   } catch (error) {
     console.log(`Error in signupUser: ${error.message}`);
-    res.status(500).json({ msg: error.message });
+    return res.status(500).json({ msg: error.message });
   }
 };
 
@@ -168,4 +168,17 @@ const followUnfollowUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-export { signupUser, signinUser, logoutUser, followUnfollowUser };
+
+// google login
+const googleLogin = (req, res) => {
+  const user = req.user;
+  console.log(user);
+  generateToken(user._id, res);
+
+  return res.json({
+    msg: "Logged in successfuly",
+    // token,
+    user,
+  });
+};
+export { signupUser, signinUser, logoutUser, followUnfollowUser, googleLogin };

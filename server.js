@@ -8,6 +8,7 @@ import passport from "passport";
 import initializePassport from "./config/passport-local.js";
 import cors from "cors";
 import session from "express-session";
+import "./config/passport-google-oauth.js";
 dotenv.config();
 
 connectDB();
