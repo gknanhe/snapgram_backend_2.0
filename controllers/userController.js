@@ -175,10 +175,12 @@ const googleLogin = (req, res) => {
   console.log(user);
   generateToken(user._id, res);
 
-  return res.json({
-    msg: "Logged in successfuly",
-    // token,
-    user,
-  });
+  res.redirect("http://localhost:5173");
+
+  // return res.json({
+  //   msg: "Logged in successfuly",
+  //   // token,
+  //   user,
+  // });
 };
 export { signupUser, signinUser, logoutUser, followUnfollowUser, googleLogin };

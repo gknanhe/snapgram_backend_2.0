@@ -9,12 +9,15 @@ import initializePassport from "./config/passport-local.js";
 import cors from "cors";
 import session from "express-session";
 import "./config/passport-google-oauth.js";
+// import https from "https";
 dotenv.config();
 
 connectDB();
 const app = express();
 
 const PORT = process.env.PORT || 8000;
+
+// https.globalAgent.options.rejectUnauthorized = false;
 
 // Initialize passport
 initializePassport(passport);
