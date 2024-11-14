@@ -90,7 +90,7 @@ const signinUser = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(400).json({ msg: info.msg || "Invalid credentials" });
+      return res.status(401).json({ msg: info.msg || "Invalid credentials" });
     }
 
     //Generate token if authentication is successful

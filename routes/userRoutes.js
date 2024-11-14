@@ -9,6 +9,7 @@ import {
 } from "../controllers/userController.js";
 import protectRoute from "../middlewares/protectRoute.js";
 import { uploadImage } from "../controllers/cloudinaryController.js";
+import { getPosts } from "../controllers/postsController.js";
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.post("/logout", logoutUser);
 //image routes
 
 router.post("/upload", protectRoute, upload.single("file"), uploadImage);
+router.get("/posts", protectRoute, getPosts);
 
 router.post("/follow/:id", protectRoute, followUnfollowUser);
 export default router;

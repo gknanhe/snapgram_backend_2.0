@@ -7,7 +7,11 @@ const postSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    text: {
+    caption: {
+      type: String,
+      maxLength: 500,
+    },
+    tags: {
       type: String,
       maxLength: 500,
     },
@@ -16,11 +20,17 @@ const postSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
-    likes: {
-      type: Number,
-      default: 0,
+    imgUrl: {
+      type: String,
+      required: true,
     },
+
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     replies: [
       {
         userId: {

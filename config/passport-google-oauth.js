@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 dotenv.config();
 
 passport.serializeUser((user, done) => {
-  console.log("inside serialize");
+  // console.log("inside serialize");
   done(null, user._id); // Store the user's ID in the session
 });
 
@@ -27,8 +27,9 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.CALLBACK_URL,
     },
+
     async (accessToken, refreshToken, profile, done) => {
-      console.log("Google profile", profile);
+      // console.log("Google profile", profile);
       try {
         let existingUser = await User.findOne({
           email: profile.emails[0].value,
