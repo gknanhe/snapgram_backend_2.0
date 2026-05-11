@@ -35,10 +35,12 @@ const userSChema = mongoose.Schema(
       type: [String],
       default: [],
     },
-    savedPosts: {
-      type: [String],
-      default: [],
-    },
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
 
     likedPosts: {
       type: [String],

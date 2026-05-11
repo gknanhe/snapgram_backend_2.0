@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Post from "../models/postModel.js";
 import User from "../models/userModel.js";
 
@@ -5,10 +6,14 @@ export const userProfile = async (req, res) => {
   const id = req.params.id;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Invalid user id" });
+    }
+
     const user = await User.findById(id).select("-password");
 
     if (!user) {
-      res.status(204).json({ msg: "No user found" });
+      return res.status(404).json({ msg: "No user found" });
     }
 
     res.status(200).json(user);
@@ -22,6 +27,11 @@ export const userProfilePosts = async (req, res) => {
   try {
     const id = req.params.id;
     console.log(id);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Invalid user id" });
+    }
+
     const page = parseInt(req.body.page) || 1;
     const limit = 2;
 
@@ -36,11 +46,12 @@ export const userProfilePosts = async (req, res) => {
     const posts = await Post.find({ postedBy: id })
       .sort({ createdAt: -1 })
       .skip(skipIndex)
-      .limit(limit);
+      .limit(limit)
+      .populate("postedBy", "name profilePic");
 
     // console.log(posts);
 
-    const totalPosts = await Post.countDocuments();
+    const totalPosts = await Post.countDocuments({ postedBy: id });
 
     res.status(200).json({
       posts,

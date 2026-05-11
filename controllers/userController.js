@@ -1,7 +1,9 @@
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/helpers/generateToken.js";
 import passport from "passport";
+import mongoose from "mongoose";
 
 //signup user
 const signupUser = async (req, res) => {
@@ -169,6 +171,71 @@ const followUnfollowUser = async (req, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({ _id: { $ne: req.user._id } })
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.log(`Error in getUsers controller: ${error.message}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const toggleSavePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Invalid post id" });
+    }
+
+    const post = await Post.findById(id);
+
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    const user = await User.findById(req.user._id).select("-password");
+    const isSaved = user.savedPosts.some((postId) => postId.equals(id));
+
+    if (isSaved) {
+      user.savedPosts.pull(id);
+    } else {
+      user.savedPosts.push(id);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      msg: isSaved ? "Post removed from saved" : "Post saved",
+      saved: !isSaved,
+      savedPosts: user.savedPosts,
+      user,
+    });
+  } catch (error) {
+    console.log(`Error in toggleSavePost controller: ${error.message}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getSavedPosts = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("savedPosts");
+
+    const posts = await Post.find({ _id: { $in: user.savedPosts } })
+      .populate("postedBy", "name profilePic")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(posts);
+  } catch (error) {
+    console.log(`Error in getSavedPosts controller: ${error.message}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // google login
 const googleLogin = (req, res) => {
   const user = req.user;
@@ -183,4 +250,13 @@ const googleLogin = (req, res) => {
   //   user,
   // });
 };
-export { signupUser, signinUser, logoutUser, followUnfollowUser, googleLogin };
+export {
+  signupUser,
+  signinUser,
+  logoutUser,
+  followUnfollowUser,
+  getUsers,
+  toggleSavePost,
+  getSavedPosts,
+  googleLogin,
+};
