@@ -10,6 +10,10 @@ import {
 import protectRoute from "../middlewares/protectRoute.js";
 import { uploadImage } from "../controllers/cloudinaryController.js";
 import { getPosts } from "../controllers/postsController.js";
+import {
+  userProfile,
+  userProfilePosts,
+} from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -24,5 +28,8 @@ router.post("/logout", logoutUser);
 router.post("/upload", protectRoute, upload.single("file"), uploadImage);
 router.get("/posts", protectRoute, getPosts);
 
+//profile routes
+router.get("/profile/:id", protectRoute, userProfile);
+router.post("/profile/:id/posts", protectRoute, userProfilePosts);
 router.post("/follow/:id", protectRoute, followUnfollowUser);
 export default router;
