@@ -21,9 +21,10 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: "/api/auth/callback/success",
     failureRedirect: `${getClientUrl()}/sign-in`,
-  })
+    session: false,
+  }),
+  googleLogin
 );
 
 // Success

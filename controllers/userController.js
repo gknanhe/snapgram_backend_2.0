@@ -241,16 +241,14 @@ const getSavedPosts = async (req, res) => {
 // google login
 const googleLogin = (req, res) => {
   const user = req.user;
-  console.log(user);
+
+  if (!user?._id) {
+    return res.redirect(`${getClientUrl()}/sign-in`);
+  }
+
   generateToken(user._id, res);
 
   res.redirect(getClientUrl());
-
-  // return res.json({
-  //   msg: "Logged in successfuly",
-  //   // token,
-  //   user,
-  // });
 };
 export {
   signupUser,
