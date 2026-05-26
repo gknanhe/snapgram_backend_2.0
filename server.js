@@ -4,18 +4,26 @@ import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import authRoute from "./routes/authRoute.js";
+import messageRoutes from "./routes/messageRoutes.js";
 import passport from "passport";
 import initializePassport from "./config/passport-local.js";
 import cors from "cors";
 import session from "express-session";
 import "./config/passport-google-oauth.js";
+import http from "http";
+import initializeSocket from "./socket/socket.js";
 // import https from "https";
 dotenv.config();
 
 connectDB();
 const app = express();
+const server = http.createServer(app);
 
 const PORT = process.env.PORT || 8000;
+const CLIENT_ORIGIN =
+  process.env.FRONTEND_URL ||
+  process.env.FRONTENT_URL ||
+  "http://localhost:5173";
 
 // https.globalAgent.options.rejectUnauthorized = false;
 
@@ -23,7 +31,7 @@ const PORT = process.env.PORT || 8000;
 initializePassport(passport);
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: CLIENT_ORIGIN,
     credentials: true,
   })
 );
@@ -44,5 +52,8 @@ app.use(passport.session());
 //Routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoute);
+app.use("/api/messages", messageRoutes);
 
-app.listen(PORT, () => console.log(`Server started at ${PORT}`));
+initializeSocket(server, CLIENT_ORIGIN);
+
+server.listen(PORT, () => console.log(`Server started at ${PORT}`));
