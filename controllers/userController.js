@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/helpers/generateToken.js";
 import passport from "passport";
 import mongoose from "mongoose";
+import { getClearAuthCookieOptions } from "../utils/helpers/cookieOptions.js";
+import { getClientUrl } from "../utils/helpers/clientUrl.js";
 
 //signup user
 const signupUser = async (req, res) => {
@@ -122,7 +124,7 @@ const logoutUser = (req, res) => {
       return res.status(500).json({ msg: "Failed to log out" });
     }
 
-    res.clearCookie("snapgToken");
+    res.clearCookie("snapgToken", getClearAuthCookieOptions());
     res.status(200).json({ msg: "Logged out successfully", user: null });
   });
 };
@@ -242,7 +244,7 @@ const googleLogin = (req, res) => {
   console.log(user);
   generateToken(user._id, res);
 
-  res.redirect("http://localhost:5173");
+  res.redirect(getClientUrl());
 
   // return res.json({
   //   msg: "Logged in successfuly",

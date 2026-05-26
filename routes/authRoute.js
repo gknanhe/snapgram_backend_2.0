@@ -3,6 +3,7 @@ import express from "express";
 import passport from "passport";
 import { googleLogin } from "../controllers/userController.js";
 import dotenv from "dotenv";
+import { getClientUrl } from "../utils/helpers/clientUrl.js";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     successRedirect: "/api/auth/callback/success",
-    failureRedirect: `${process.env.FRONTENT_URL}/sign-in`,
+    failureRedirect: `${getClientUrl()}/sign-in`,
   })
 );
 
@@ -30,6 +31,6 @@ router.get(
 router.get("/callback/success", googleLogin);
 
 router.get("/api/callback/failure", (req, res) => {
-  res.redirect(`${process.env.FRONTENT_URL}/sign-in`);
+  res.redirect(`${getClientUrl()}/sign-in`);
 });
 export default router;

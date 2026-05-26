@@ -12,6 +12,7 @@ import session from "express-session";
 import "./config/passport-google-oauth.js";
 import http from "http";
 import initializeSocket from "./socket/socket.js";
+import { getClientOrigin } from "./utils/helpers/clientUrl.js";
 // import https from "https";
 dotenv.config();
 
@@ -20,10 +21,8 @@ const app = express();
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 8000;
-const CLIENT_ORIGIN =
-  process.env.FRONTEND_URL ||
-  process.env.FRONTENT_URL ||
-  "http://localhost:5173";
+const isProduction = process.env.NODE_ENV === "production";
+const CLIENT_ORIGIN = getClientOrigin();
 
 // https.globalAgent.options.rejectUnauthorized = false;
 
@@ -41,6 +40,10 @@ app.use(
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
+    },
   })
 );
 app.use(express.json()); // to parse JSON data in req.body
